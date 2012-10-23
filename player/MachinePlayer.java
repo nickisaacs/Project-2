@@ -9,7 +9,9 @@ package player;
 public class MachinePlayer extends Player {
 	
   public int color;
+  public int oppColor
   public int searchDepth;
+  private int Board internal;
   // Creates a machine player with the given color.  Color is either 0 (black)
   // or 1 (white).  (White has the first move.)
   public MachinePlayer(int color) {
@@ -19,8 +21,14 @@ public class MachinePlayer extends Player {
   // Creates a machine player with the given color and search depth.  Color is
   // either 0 (black) or 1 (white).  (White has the first move.)
   public MachinePlayer(int color, int searchDepth) {
+  	internal = new Board();
   	this.color = color;
   	this.searchDepth = searchDepth;
+  	if(color==WHITE){
+  		oppColor = BLACK;
+  	}else{
+  		oppColor = WHITE;
+  	}
   }
 
   // Returns a new move by "this" player.  Internally records the move (updates
@@ -34,6 +42,10 @@ public class MachinePlayer extends Player {
   // illegal, returns false without modifying the internal state of "this"
   // player.  This method allows your opponents to inform you of their moves.
   public boolean opponentMove(Move m) {
+  	if(isLegal(m, oppColor){
+  		BoardSize.makeMove(m);
+  		return true;
+  	}
     return false;
   }
 
