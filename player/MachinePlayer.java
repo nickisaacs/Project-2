@@ -42,8 +42,8 @@ public class MachinePlayer extends Player {
   // illegal, returns false without modifying the internal state of "this"
   // player.  This method allows your opponents to inform you of their moves.
   public boolean opponentMove(Move m) {
-  	if(isLegal(m, oppColor){
-  		BoardSize.makeMove(m);
+  	if(internal.isLegal(m, oppColor){
+  		internal.makeMove(m, oppColor);
   		return true;
   	}
     return false;
@@ -55,6 +55,10 @@ public class MachinePlayer extends Player {
   // player.  This method is used to help set up "Network problems" for your
   // player to solve.
   public boolean forceMove(Move m) {
+    if(internal.isLegal(m, color){
+  		internal.makeMove(m, color);
+  		return true;
+  	}
     return false;
   }
 

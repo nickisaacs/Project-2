@@ -85,5 +85,27 @@ class Board{
 		return false;
 	}
 	
+	public void makeMove(Move m, int oppColor){
+		switch(m.moveKind){
+			
+			case QUIT: return;
+			
+			case STEP:
+				BoardSize[m.x1][m.y1] = new Chip(m.x1, m.y1, oppColor); 
+				BoardSize[m.x2][m.y2] = null;
+			
+			case ADD:
+				BoardSize[m.x1][m.y1] = new Chip(m.x1, m.y1, oppColor);
+		}
+	}
+				
+				
+				
+				
+				
+				
+				
+				
+	
 	
 }
