@@ -1,4 +1,4 @@
-package player
+package player;
 
 class Board{
 	
@@ -19,8 +19,8 @@ class Board{
 	
 	public void addChip(int x, int y, int color){
 		BoardSize[x][y] = new Chip(x, y, color);
-		BoardSize[x][y].isTouched = BoardSize.neighbors(x, y);
-		if(color == WHITE){
+		BoardSize[x][y].isTouched = neighbors(x, y, color);
+		if(color == MachinePlayer.WHITE){
 			numWhite++;
 		}else{
 			numBlack++;
@@ -57,18 +57,26 @@ class Board{
 	/** Checks if a move is legal on the current board
 	*/
 	public boolean isLegal(Move m, int color){
-		if(m.moveKind == QUIT) return true;
-		if(m.moveKind == STEP && x1 == x2 && y1 == y2) return false; // Cant move to same place
+		if(m.moveKind == Move.QUIT) return true;
+		if(m.moveKind == Move.STEP && m.x1 == m.x2 && m.y1 == m.y2) return false; 
+		// Cant move to same place
 		if(BoardSize[m.x1][m.y1] != null) return false; // Already occupied
 		
 		// Check the goal lines
-		if(color == WHITE && m.x1 == 7 || m.x1 == 0)return false;
-		if(color == BLACK && m.y1 == 7 || m.y1 == 0)return false;
+		if(color == MachinePlayer.WHITE && m.y1 == 7 || m.y1 == 0)return false;
+		if(color == MachinePlayer.BLACK && m.x1 == 7 || m.x1 == 0)return false;
 		
 		// Check the corners
-		if(m.x1==0 && m.y1==0 || 
+		if(m.x1 == 0){
+			if(m.y1 == 0 || m.y1 == 7) return false;
+		}
+		if(m.x1 == 7){
+			if(m.y1 == 0 || m.y1 == 7) return false;
+		}
 		
 		if(checkCluster(m, color)) return false;
+		
+		return true;
 	}
 	
 	/** retun true if @m would form a cluster
@@ -77,7 +85,7 @@ class Board{
 		for(int i=-1; i<2; i++){
 			for(int j=-1; j<2; j++){
 				if(i==0 && j==0) continue;
-				if(BoardSize[m.x1+1][m.y1+j].color == color){
+				if(BoardSize[m.x1+1][m.y1+j].chipColor == color){
 					if(neighbors(m.x1+1, m.y1+j, m.x1, m.y1, color)) return true;
 				}
 			}
@@ -88,13 +96,13 @@ class Board{
 	public void makeMove(Move m, int oppColor){
 		switch(m.moveKind){
 			
-			case QUIT: return;
+			case Move.QUIT: return;
 			
-			case STEP:
+			case Move.STEP:
 				BoardSize[m.x1][m.y1] = new Chip(m.x1, m.y1, oppColor); 
 				BoardSize[m.x2][m.y2] = null;
 			
-			case ADD:
+			case Move.ADD:
 				BoardSize[m.x1][m.y1] = new Chip(m.x1, m.y1, oppColor);
 		}
 	}
