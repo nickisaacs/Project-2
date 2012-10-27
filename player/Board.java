@@ -2,6 +2,15 @@ package player;
 
 class Board{
 	
+	private static final int NO = 1;
+	private static final int NE = 2;
+	private static final int EA = 3;
+	private static final int SE = 4;
+	private static final int SO = 5;
+	private static final int SW = 6;
+	private static final int WE = 7;
+	private static final int NW = 8;
+	
 	private Chip[][] BoardSize; // Follow java convention where (0,0) is top left when it matters
 	private int numWhite;
 	private int numBlack;
@@ -106,11 +115,87 @@ class Board{
 				BoardSize[m.x1][m.y1] = new Chip(m.x1, m.y1, oppColor);
 		}
 	}
+	
+	public boolean hasNetork(Chip c){
+		int netScore = 0;
+		if(checkGoal(c.chipColor)=0){
+				return false;
+		}
+		
+		for(int i=0; i<checkGoal(c.chipColor); i++){
+			setVisitedFlagFalse(c.chipColor);
+			
+			if(explore(c, 0, 0) = 1000){
+				return true;
+			}
+			return false;
+		}
+	}
+	
+	int explore(Chip c, int length, int direction){ // diretction used to enforce turning requirement, length used to enforce rule
+		int currScore = 0;
+		int tempScore;
+		Chip neighborChip;
+		int colorChips;
+		if(c.color == MachinePlayer.BLACK){
+			colorChips = numBlack;
+		}else{
+			colorChips = numWhite;
+		}
+		
+		c.isVisited = true;// makes sure we do not loop this location
+		for(int i=0; i<colorChips; i++){
+			tempChip = getNeighbor(i);
+			tempScore = applyRules(tempChip);
+			if(tempScore > 1000){
+				explore(tempChip.chipColor, tempChip, length++, i);
+			}
+		} 
+	
+			
+		c.isVisited = false;
+		return currScore;
+	}
+	
+	private Chip getNeighbor(int direction){
+				switch(direction){
 				
-				
-				
-				
-				
+					case NO: 
+						for(int i=1; i<=(8-c.x); i++){
+							if(BoardSize[c.x][c.y-i]!= null) return BoardSize[c.x][c.y-i];
+						}
+					case SO: 
+						for(int i=1; i<=(8-c.x); i++){
+							if(BoardSize[c.x][c.y+i].chipColor != c.chipColor) return BoardSize[c.x][c.y+i];
+						}
+					case WE: 
+						for(int i=1; i<=(8-c.x); i++){
+							if(BoardSize[c.x-i][c.y].chipColor = c.chipColor) return BoardSize[c.x-i][c.y];
+						}
+					case EA: 
+						for(int i=1; i<=(8-c.x); i++){
+							if(BoardSize[c.x+i][c.y].chipColor = c.chipColor) return BoardSize[c.x+i][c.y];
+						}
+					case NE: 
+						for(int i=1; i<=(8-c.x); i++){
+							if(BoardSize[c.x+i][c.y-i].chipColor = c.chipColor) return BoardSize[c.x+i][c.y-i];
+						}
+					case SE: 
+						for(int i=1; i<=(8-c.x); i++){
+							if(BoardSize[c.x+i][c.y+i].chipColor = c.chipColor) return BoardSize[c.x+i][c.y+i];
+						}
+					case SW: 
+						for(int i=1; i<=(8-c.x); i++){
+							if(BoardSize[c.x-i][c.y+i].chipColor = c.chipColor) return BoardSize[c.x-i][c.y+i];
+						}
+					case NW: 
+						for(int i=1; i<=(8-c.x); i++){
+							if(BoardSize[c.x-i][c.y-i].chipColor = c.chipColor) return BoardSize[c.x-i][c.y-i];
+						}
+			
+			}
+		}
+	}
 				
 				
 				
