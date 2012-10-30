@@ -1,0 +1,36 @@
+Class descriptions
+	Board class (John Matt)
+		- Defines an internal gameboard
+		- Checks the board for legal moves
+		- Scores potential moves
+	
+	Chip Class (Nick)
+		- Used by the board class to represent the Chips of the game
+		- Location aware
+		- Contains color of the chip on the board
+	
+	MachinePlayer Class
+		- Implements the board class
+
+Class Methods
+	Board Class
+		- neighbors(x, y, color) returns true if a chip touches a chip of the same color
+		
+		- neighbors(x, y, x2, y2, color) returns true if a chip touches a chip of the same color, ignoring the second coordinates
+		
+		- isLegal(Move M, int color) checks if a move is legal on the current board
+		
+		- makeMove(Move m, int color) Makes a spcified move on the internal game board
+		
+		- hasNetork(Chip c) returns true if a chip is part of a network
+		
+		- explore(Chip c, int length, int direction) searches for the highest possible scoring move
+		
+		- score(Chip c) scores a move based on given criteria
+		
+		- getNeighbor(int direction) gets the nearest neighor in a specified direction
+		
+		
+		
+		
+		

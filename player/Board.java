@@ -101,7 +101,8 @@ class Board{
 		}
 		return false;
 	}
-	
+	/** Makes a spcified move on the internal game board
+	*/
 	public void makeMove(Move m, int oppColor){
 		switch(m.moveKind){
 			
@@ -118,7 +119,7 @@ class Board{
 	
 	public boolean hasNetork(Chip c){
 		int netScore = 0;
-		if(checkGoal(c.chipColor)=0){
+		if(checkGoal(c.chipColor) == 0){
 				return false;
 		}
 		
@@ -132,7 +133,7 @@ class Board{
 		}
 	}
 	
-	int explore(Chip c, int length, int direction){ // diretction used to enforce turning requirement, length used to enforce rule
+	public int explore(Chip c, int length, int direction){ // diretction used to enforce turning requirement, length used to enforce rule
 		int currScore = 0;
 		int tempScore;
 		Chip neighborChip;
@@ -146,8 +147,8 @@ class Board{
 		c.isVisited = true;// makes sure we do not loop this location
 		for(int i=0; i<colorChips; i++){
 			tempChip = getNeighbor(i);
-			tempScore = applyRules(tempChip);
-			if(tempScore > 1000){
+			tempScore = score(tempChip);
+			if(tempScore >= 1000){
 				explore(tempChip.chipColor, tempChip, length++, i);
 			}
 		} 
@@ -194,6 +195,7 @@ class Board{
 						}
 			
 			}
+			return null; // Figure out 
 		}
 	}
 				
