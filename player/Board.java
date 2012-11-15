@@ -214,31 +214,31 @@ public class Board{
 		return false;
 	}
 	
-	private Chip getNeighbor(Chip c, int skipDirection){
-				NeighborChip temp;
+	private NeighborChip getNeighbor(Chip c, int skipDirection){
+		NeighborChip temp;
 					
-				for(int j=1; i<9; j++){
-					if(i == skipDirection)continue;
-				
-					switch(j){
-				
-						case NO: 
-							for(int i=1; i<=(8-c.x); i++){
-								if(BoardSize[c.x][c.y-i]!= null){
-									temp = (NeighborChip) BoardSize[c.x][c.y-i];
-									temp.prevDir = i;
-									return temp;
-								}
+			for(int j=1; j<9; j++){
+				if(j == skipDirection)continue;
+			
+				switch(j){
+			
+					case NO: 
+						for(int i=1; i<=(8-c.x); i++){
+							if(BoardSize[c.x][c.y-i]!= null){
+								temp = (NeighborChip) BoardSize[c.x][c.y-i];
+								temp.prevDir = i;
+								return temp;
 							}
+						}
 						
-						case SO: 
-							for(int i=1; i<=(8-c.x); i++){
-								if(BoardSize[c.x][c.y+i].chipColor != c.chipColor){
-									temp = (NeighborChip) BoardSize[c.x][c.y+i];
-									temp.prevDir = i;
-									return temp;
-							
-							}
+					case SO: 
+						for(int i=1; i<=(8-c.x); i++){
+							if(BoardSize[c.x][c.y+i].chipColor != c.chipColor){
+								temp = (NeighborChip) BoardSize[c.x][c.y+i];
+								temp.prevDir = i;
+								return temp;
+							}	
+						}
 					
 						case WE: 
 							for(int i=1; i<=(8-c.x); i++){
@@ -247,7 +247,7 @@ public class Board{
 									temp.prevDir = i;
 									return temp;
 								}
-						}
+							}
 					
 						case EA: 
 							for(int i=1; i<=(8-c.x); i++){
@@ -266,7 +266,6 @@ public class Board{
 									return temp;
 								}
 							}
-						}
 					
 						case SE: 
 							for(int i=1; i<=(8-c.x); i++){
@@ -299,6 +298,7 @@ public class Board{
 							return null;
 					}
 				}
+				return null;
 	}
 	
 	/**
