@@ -176,44 +176,44 @@ public class Board{
 	}
 	
 	public boolean explore(Chip c, int length, int direction){ // diretction used to enforce turning requirement, length used to enforce rule
+		
 		Chip neighborChip; // Could need to Declare
 		int colorChips;
 		if(c.chipColor == MachinePlayer.BLACK){
 			colorChips = numBlack;
-		}else{
+		}
+		else{
 			colorChips = numWhite;
 		}
 		if(colorChips <6){
 			return false;
 		}
-		
 		c.isVisited = true;// makes sure we do not loop this location
-		for(int i=0; i<colorChips; i++){
-			neighborChip = getNeighbor(c, i);
-			if(neighborChip.isVisited == true)
-				continue;
-			if(neighborChip != null){
-				if (isStartGoal(neighborChip))
-					continue;
-				if(i == direction)
-					continue;
-				if(isEndGoal(neighborChip)){
-					if(length>=5)
+			if(length >= 1)
+				neighborChip = getNeighbor(c, NW);
+			else
+				neighborChip = getNeighbor(c, neighborChip.prevDir);
+				
+				if(neighborChip != null){
+					if(neighborChip.isVisited == true)
+						continue;
+					if(isStartGoal(neighborChip))
+						continue;
+					if(isEndGoal(neighborChip)){
+						if(length>=5)
+							return true;
+					}
+					else{
+						if(explore(neighborChip, length++, neighborChip.prevDir)){
 						return true;
-				}
-				else{
-					if(explore(neighborChip, length++, i)){
-						return true;
+						}
 					}
 				}
-			}
-				
-
-		}
+			
 		c.isVisited = false;
 		return false;
 	}
-	
+		
 	private NeighborChip getNeighbor(Chip c, int skipDirection){
 		NeighborChip temp;
 					
