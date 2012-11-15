@@ -217,13 +217,13 @@ public class Board{
 	private Chip getNeighbor(Chip c, int skipDirection){
 				NeighborChip temp;
 					
-				for(int i=1; i<9; i++){
+				for(int j=1; i<9; j++){
 					if(i == skipDirection)continue;
 				
-					switch(i){
+					switch(j){
 				
 						case NO: 
-							for(int i=1; i<=(7-c.x); i++){
+							for(int i=1; i<=(8-c.x); i++){
 								if(BoardSize[c.x][c.y-i]!= null){
 									temp = (NeighborChip) BoardSize[c.x][c.y-i];
 									temp.prevDir = i;
@@ -239,37 +239,66 @@ public class Board{
 									return temp;
 							
 							}
+					
 						case WE: 
 							for(int i=1; i<=(8-c.x); i++){
-								if(BoardSize[c.x-i][c.y].chipColor == c.chipColor) return BoardSize[c.x-i][c.y];
+								if(BoardSize[c.x-i][c.y].chipColor == c.chipColor){
+									temp = (NeighborChip) BoardSize[c.x-i][c.y];
+									temp.prevDir = i;
+									return temp;
+								}
 						}
-					case EA: 
-						for(int i=1; i<=(8-c.x); i++){
-							if(BoardSize[c.x+i][c.y].chipColor == c.chipColor){
-					 		temp = (NeighborChip) BoardSize[c.x+i][c.y];
-							temp.prevDir = i;
-							return temp;
+					
+						case EA: 
+							for(int i=1; i<=(8-c.x); i++){
+								if(BoardSize[c.x+i][c.y].chipColor == c.chipColor){
+					 			temp = (NeighborChip) BoardSize[c.x+i][c.y];
+								temp.prevDir = i;
+								return temp;
 							}
 						}
-					case NE: 
-						for(int i=1; i<=(8-c.x); i++){
-							if(BoardSize[c.x+i][c.y-i].chipColor == c.chipColor) return BoardSize[c.x+i][c.y-i];
+					
+						case NE: 
+							for(int i=1; i<=(8-c.x); i++){
+								if(BoardSize[c.x+i][c.y-i].chipColor == c.chipColor){
+									temp = (NeighborChip) BoardSize[c.x+i][c.y-i];
+									temp.prevDir = i;
+									return temp;
+								}
+							}
 						}
-					case SE: 
-						for(int i=1; i<=(8-c.x); i++){
-							if(BoardSize[c.x+i][c.y+i].chipColor == c.chipColor) return BoardSize[c.x+i][c.y+i];
+					
+						case SE: 
+							for(int i=1; i<=(8-c.x); i++){
+								if(BoardSize[c.x+i][c.y+i].chipColor == c.chipColor){
+									temp = (NeighborChip) BoardSize[c.x+i][c.y+i];
+									temp.prevDir = i;
+									return temp;
+								}
+							}
+					
+						case SW: 
+							for(int i=1; i<=(8-c.x); i++){
+								if(BoardSize[c.x-i][c.y+i].chipColor == c.chipColor){
+									temp = (NeighborChip) BoardSize[c.x-i][c.y+i];
+									temp.prevDir = i;
+									return temp;
+								}
+							}
+					
+						case NW: 
+							for(int i=1; i<=(8-c.x); i++){
+								if(BoardSize[c.x-i][c.y-i].chipColor == c.chipColor){
+									temp = (NeighborChip) BoardSize[c.x-i][c.y-i];
+									temp.prevDir = i;
+									return temp;
+								}
+							}
+						
+						default:
+							return null;
 					}
-					case SW: 
-						for(int i=1; i<=(8-c.x); i++){
-							if(BoardSize[c.x-i][c.y+i].chipColor == c.chipColor) return BoardSize[c.x-i][c.y+i];
-					}
-					case NW: 
-						for(int i=1; i<=(8-c.x); i++){
-							if(BoardSize[c.x-i][c.y-i].chipColor == c.chipColor) return BoardSize[c.x-i][c.y-i];
-					}
-			
 				}
-			return null; // Figure out 
 	}
 	
 	/**
