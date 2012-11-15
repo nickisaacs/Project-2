@@ -44,6 +44,15 @@ public class Board{
 	}
 		
 	private boolean neighbors(int x, int y, int color){ // Returns true if it touches same color chip
+		boolean tempChipFlag = false;
+		if(BoardSize[x][y] == null){
+			Chip placeHolder = new Chip(x, y, color);
+			BoardSize[x][y] = placeHolder;
+			placeHolder.isVisited = true;
+			tempChipFlag = true;
+		}else{
+			BoardSize[x][y].isVisited = true;
+		}
 		for(int i=-1; i<2; i++){
 			for(int j=-1; j<2; j++){
 				if(i==0 && j==0) continue;
@@ -51,16 +60,35 @@ public class Board{
 				if(x+i < 0 || x+i >7) continue;
 				if(y+j < 0 || y+j >7) continue;
 				if(BoardSize[x+i][y+j] == null) continue;
-				else if(BoardSize[x+i][y+j].chipColor == color){
-					BoardSize[x+i][y+j].isTouched = true;
+				if(BoardSize[x+i][y+j].isVisited == true) continue;
+				if(BoardSize[x+i][y+j].chipColor == color){
+					return true;
+				}else if(neighbors(x+i, y+j, x, y, color)){
 					return true;
 				}
 			}
 		}
+		
+		
+		if(tempChipFlag){
+			BoardSize[x][y] = null;
+		}else{
+			BoardSize[x][y].isVisited = false;
+		}	
 		return false;	
-	}
+	}	
 	
 	private boolean neighbors(int x, int y, int x2, int y2, int color){ // Returns true if it touches same chip, ignores the second list coordinates (legality checking)
+	
+		boolean tempChipFlag = false;
+		if(BoardSize[x][y] == null){
+			Chip placeHolder = new Chip(x, y, color);
+			BoardSize[x][y] = placeHolder;
+			placeHolder.isVisited = true;
+			tempChipFlag = true;
+		}else{
+			BoardSize[x][y].isVisited = true;
+		}
 		for(int i=-1; i<2; i++){
 			for(int j=-1; j<2; j++){
 				if(i==0 && j==0) continue;
@@ -69,11 +97,19 @@ public class Board{
 				if(x+i < 0 || x+i >7) continue;
 				if(y+j < 0 || y+j >7) continue;
 				if(BoardSize[x+i][y+j] == null) continue;
+				if(BoardSize[x+i][y+j].isVisited == true) continue;
 				if(BoardSize[x+i][y+j].chipColor == color){
+					return true;
+				}else if(neighbors(x+i, y+j, x, y, color)){
 					return true;
 				}
 			}
 		}
+		if(tempChipFlag){
+			BoardSize[x][y] = null;
+		}else{
+			BoardSize[x][y].isVisited = false;
+		}	
 		return false;	
 	}	
 	
@@ -81,23 +117,48 @@ public class Board{
 	*/
 	public boolean isLegal(Move m, int color){
 		if(m.moveKind == Move.QUIT) return true;
-		if(m.moveKind == Move.STEP && m.x1 == m.x2 && m.y1 == m.y2) return false; 
+		
+		if(m.moveKind == Move.STEP && (m.x1 == m.x2 && m.y1 == m.y2)){
+			System.out.println("False at step move same place");
+			return false;
+		}
 		// Cant move to same place
-		if(BoardSize[m.x1][m.y1] != null) return false; // Already occupied
+		if(BoardSize[m.x1][m.y1] != null){
+			System.out.println("False at occupied");
+			return false; // Already occupied
+		}
 		
 		// Check the goal lines
-		if(color == MachinePlayer.WHITE && m.y1 == 7 || m.y1 == 0)return false;
-		if(color == MachinePlayer.BLACK && m.x1 == 7 || m.x1 == 0)return false;
-		
+		if(color == MachinePlayer.WHITE){
+			if(m.y1 == 7 || m.y1 == 0){
+				System.out.println("False at goal line 1");
+				return false;
+			}
+		}
+		if(color == MachinePlayer.BLACK){
+			if(m.x1 == 7 || m.x1 == 0){
+				System.out.println("False at goal line 2");
+				return false;
+			}
+		}
 		// Check the corners
 		if(m.x1 == 0){
+			System.out.println("False at corner");
 			if(m.y1 == 0 || m.y1 == 7) return false;
 		}
 		if(m.x1 == 7){
+			System.out.println("False at corner");
 			if(m.y1 == 0 || m.y1 == 7) return false;
 		}
 		
-		if(checkCluster(m, color)) return false;
+		if(m.moveKind == Move.STEP && neighbors(m.x1, m.y1, m.x2, m.y2, color)){
+			System.out.println("False at cluster");
+			return false;
+		}
+		if(m.moveKind == Move.ADD && neighbors(m.x1, m.y1, color)){
+			System.out.println("False at corner");
+			return false;
+		}
 		
 		return true;
 	}
@@ -107,11 +168,14 @@ public class Board{
 	private boolean checkCluster(Move m, int color){
 		for(int i=-1; i<2; i++){
 			for(int j=-1; j<2; j++){
-				if(i==0 && j==0) continue;
+				if(i==0 && j==0) continue; // Don't check current location
 				
 				if(m.x1+i < 0 || m.x1+i>7) continue;
+				
 				if(m.y1+j <0 || m.y1+j >7) continue;
+				
 				if(BoardSize[m.x1+i][m.y1+j] == null) continue;
+				
 				if(BoardSize[m.x1+i][m.y1+j].chipColor == color){
 					if(neighbors(m.x1+i, m.y1+j, m.x1, m.y1, color)) return true;
 				}
@@ -351,7 +415,7 @@ public class Board{
 	public boolean touched(int x, int y){
 		return BoardSize[x][y].isTouched;
 	}
-				
+		
 	
 	
 }

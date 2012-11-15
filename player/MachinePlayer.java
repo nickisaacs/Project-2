@@ -1,6 +1,8 @@
 /* MachinePlayer.java */
 
 package player;
+import java.util.Random;
+import java.lang.Math;
 
 /**
  *  An implementation of an automatic Network player.  Keeps track of moves
@@ -13,11 +15,12 @@ public class MachinePlayer extends Player {
   public int color;
   public int oppColor;
   public int searchDepth;
+  private int numChips;
   private Board internal;
   // Creates a machine player with the given color.  Color is either 0 (black)
   // or 1 (white).  (White has the first move.)
   public MachinePlayer(int color) {
-  	this(color, -1);
+  	this(color, 1);
   }
 
   // Creates a machine player with the given color and search depth.  Color is
@@ -36,42 +39,34 @@ public class MachinePlayer extends Player {
   // Returns a new move by "this" player.  Internally records the move (updates
   // the internal game board) as a move by "this" player.
   public Move chooseMove() {
-	  int max = -10000;
-	  int cordX = 0;
-	  int cordY = 0;
-	  if(internal.number(color) == 10){ // FIXME: how many till step move
-		  for(int x = 0; x<7; x++){
-			  for(int y = 0; y<7; y++){
-				  Move temp = new Move(x,y);
-				  if(internal.isLegal(temp, color)){
-					  int temp2 = score();
-					  if(temp2>max){
-						  max = temp2;
-						  cordX = x;
-						  cordY = y;
-					  }
-				  }
-			  }
-		  }
-	  }
-	  else{
-		  for(int x = 0; x<7; x++){
-			  for(int y = 0; y<7; y++){
-				  Move temp = new Move(x,y);
-				  if(internal.isLegal(temp, color)){
-					  int temp2 = score();
-					  if(temp2>max){
-						  max = temp2;
-						  cordX = x;
-						  cordY = y;
-					  }
-				  }
-			  }
-		  }
-	  }
-    return new Move(cordX, cordY);
+	  
+	  if(numChips < 10)
+		return addMoveScore();
+		else{
+		return stepMoveScore();
+	}
   } 
 
+/*
+	public Move chooseMove(){
+		Random generator = new Random();
+		int cordX = Math.abs(generator.nextInt()%8);
+		int cordY = Math.abs(generator.nextInt()%8);
+		System.out.println("Accessing: ("+cordX+","+cordY+")");
+		while(true){
+			
+			Move temp = new Move(cordX, cordY);
+			if(internal.isLegal(temp, color)){
+				internal.makeMove(temp, color);
+				return temp;
+			}else{
+			cordX = Math.abs(generator.nextInt()%8);
+			cordY = Math.abs(generator.nextInt()%8);
+			System.out.println(color+" Accessing: ("+cordX+","+cordY+")");
+		}
+		}	
+	}
+*/
   // If the Move m is legal, records the move as a move by the opponent
   // (updates the internal game board) and returns true.  If the move is
   // illegal, returns false without modifying the internal state of "this"
@@ -97,7 +92,11 @@ public class MachinePlayer extends Player {
     return false;
   }
   
-  public int score(){
+  /** Private function used to score a move
+   * from the perspective of @scoringColor 
+   */
+   
+  public int score(int i, int j, int scoringColor){
 	  int score = 0;
 	  if(internal.hasNetwork(color)){
 		  score += 1000;
@@ -105,6 +104,47 @@ public class MachinePlayer extends Player {
 	  return score;
   }
   
+  /** addMoveScore() returns the score resulting from adding a chip
+   * at the given location
+   */
+	private MoveScore addMoveScore(){
+		for(int i=0; i<8; i++){
+			for(int j=0; j<8; j++){
+				
+				temp = score(b.getContents(i, j, color);
+				if(temp > maxScore){
+					maxScore = temp;
+					returnMove = new Move(i, j, )
+				}
+			}	
+		}
+	}
+	
+	/** stepMoveScore() returns the score resulting from adding a chip
+   * at the given location and moving it somewhere else
+   */
+	private MoveScore stepMoveScore(){
+		
+		for(int i=0; i<8; i++){
+			for(int j=0; j<8; j++){
+				
+				if(internal[i][j] =! null && internal[i][j].chipColor == color){
+						Chip temp = internal[i][j];
+						internal[i][j] = null;
+						int oppScore = score(i,j,oppColor); 
+						
+						addMoveScore();
+				}
+				
+				temp = score(b.getContents(i, j, color);
+				if(temp > maxScore){
+					maxScore = temp;
+					returnMove = new Move(i, j, )
+				}
+			}	
+		}
+	}
+  /*
   public static void main (String[] args){
 	Board test = new Board();
 	System.out.println(test.getContents(0,0));
@@ -150,5 +190,5 @@ public class MachinePlayer extends Player {
 		System.out.println("broken");
   	}
 
-  }
+  }A*/
 }
