@@ -498,10 +498,10 @@ public class Board{
 		System.out.print("|");
 		for(int i=0; i<8; i++){
 			for(int j=0; j<8; j++){
-				if(BoardSize[i][j] == null){
+				if(BoardSize[j][i] == null){
 					System.out.print(" |");
 				}else{
-					System.out.print(BoardSize[i][j].chipColor + "|");
+					System.out.print(BoardSize[j][i].chipColor + "|");
 				}
 			}
 			System.out.print("\n");
