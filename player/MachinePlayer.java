@@ -40,11 +40,15 @@ public class MachinePlayer extends Player {
   // the internal game board) as a move by "this" player.
   public Move chooseMove() {
 	  
-	  if(numChips < 10)
-		return addMoveScore();
-		else{
-		return stepMoveScore();
-	}
+	  if(numChips < 10){
+		Move chosenMove = (Move) addMoveScore(this.color);
+		internal.makeMove(chosenMove,color);
+		return chosenMove;
+	  }else{
+			Move chosenMove = stepMoveScore();
+			internal.makeMove(chosenMove, color);
+			return chosenMove;
+	  }
   } 
 
 /*
@@ -96,54 +100,126 @@ public class MachinePlayer extends Player {
    * from the perspective of @scoringColor 
    */
    
-  public int score(int i, int j, int scoringColor){
-	  int score = 0;
-	  if(internal.hasNetwork(color)){
-		  score += 1000;
-	  }
-	  return score;
+  public int score(Chip c){
+	  Random generator = new Random();
+
+	  return (Math.abs(generator.nextInt()%1000));
   }
   
   /** addMoveScore() returns the score resulting from adding a chip
    * at the given location
    */
-	private MoveScore addMoveScore(){
+	private MoveScore addMoveScore(int color){
+		int maxScore = -10000;
+		int x = -1;
+		int y = -1;
 		for(int i=0; i<8; i++){
 			for(int j=0; j<8; j++){
 				
-				temp = score(b.getContents(i, j, color);
-				if(temp > maxScore){
-					maxScore = temp;
-					returnMove = new Move(i, j, )
+				//System.out.println("Checking: ("+i+","+j+")");
+				Move tempMove = new Move(i, j);	
+								
+				if(internal.isLegal(tempMove, color)){
+					
+					int temp = score(internal.getContents(i, j));
+					if(temp > maxScore){
+						maxScore = temp;
+						x = i;
+						y = j;
+						//System.out.println("X and Y set to: "+x+","+y+")");
+					}	
 				}
-			}	
+			}
+	
 		}
+		
+		return new MoveScore(x, y, maxScore);
+	}
+	private MoveScore addMoveScore(int a, int b, int color){
+		Move returnMove = null;
+		int maxScore = -10000;
+		int x = -1;
+		int y = -1;
+		for(int i=0; i<8; i++){
+			for(int j=0; j<8; j++){
+									//Do something about vvvv
+				if (a == i && b == j) continue;
+				returnMove = new Move(i, j);					
+				if (internal.BoardSize[i][j] == null && internal.isLegal(returnMove, color)){
+					int temp = score(internal.getContents(i, j));
+					if(temp > maxScore){
+						maxScore = temp;
+						x = i;
+						y = j;
+					}
+					
+				}
+			}
+	
+		}
+		return new MoveScore(x, y, maxScore);
 	}
 	
 	/** stepMoveScore() returns the score resulting from adding a chip
    * at the given location and moving it somewhere else
    */
-	private MoveScore stepMoveScore(){
-		
+	private Move stepMoveScore(){
+		int maxScore = -10000;
+		int x = -1;
+		int y = -1;
+		MoveScore ourMove = null;
+		MoveScore theirMove = null;
 		for(int i=0; i<8; i++){
 			for(int j=0; j<8; j++){
 				
-				if(internal[i][j] =! null && internal[i][j].chipColor == color){
-						Chip temp = internal[i][j];
-						internal[i][j] = null;
-						int oppScore = score(i,j,oppColor); 
+				if(internal.BoardSize[i][j] != null && internal.BoardSize[i][j].chipColor == color){
+						Chip temp = internal.BoardSize[i][j];
+						internal.BoardSize[i][j] = null;
+						if(internal.hasNetwork(oppColor)){
+							internal.BoardSize[i][j] = temp;
+							continue;
+						}
+						ourMove = addMoveScore(i,j, color);
+						internal.addChip(ourMove.x1,ourMove.y1,color);
 						
-						addMoveScore();
+						theirMove = addMoveScore(oppColor); 
+						
 				}
 				
-				temp = score(b.getContents(i, j, color);
-				if(temp > maxScore){
-					maxScore = temp;
-					returnMove = new Move(i, j, )
+				if(maxScore < (ourMove.score-theirMove.score)){
+					maxScore = (ourMove.score-theirMove.score);
 				}
-			}	
+				internal.removeChip(ourMove.x1, ourMove.y1);
+			}
 		}
+		return new Move(x, y);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
   /*
   public static void main (String[] args){
 	Board test = new Board();
@@ -191,4 +267,5 @@ public class MachinePlayer extends Player {
   	}
 
   }A*/
+
 }
