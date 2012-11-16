@@ -159,6 +159,23 @@ public class Board{
 					if(BoardSize[x+i][y+j] != null){
 						if(BoardSize[x+i][y+j].chipColor == color)
 							count++;
+							int x2 = x+i;
+							int y2 = y+j;
+							for(int a=-1; a<2; a++){
+								for(int b=-1; b<2; b++){
+										if(x2+a < 0 || x2+a >7) continue;
+										if(y2+b < 0 || y2+b >7) continue;
+										if(BoardSize[x2+a][y2+b] == null || (x2+a == x && y2+b ==y)){
+											continue;
+										}else{
+											if(BoardSize[x2+a][y2+b] != null){
+												if(BoardSize[x2+a][y2+b].chipColor == color)
+													count++;
+											}
+										}
+								}
+							}
+							
 					}
 				}
 			}
@@ -208,14 +225,17 @@ public class Board{
 			}
 		}
 		
-		if(m.moveKind == Move.STEP && neighbors(m.x1, m.y1, m.x2, m.y2, color)){
+		/*if(m.moveKind == Move.STEP && neighbors(m.x1, m.y1, m.x2, m.y2, color)){
 			//System.out.println("False at cluster");
 			return false;
-		}
-		if(m.moveKind == Move.ADD && neighbors(m.x1, m.y1, color)){
+		}*/
+		//New Cluster Checker!!
+		if(numNeighbors(m.x1,m.y1,color) > 1) //easy clusters
+			return false;
+		/*if(m.moveKind == Move.ADD && neighbors(m.x1, m.y1, color)){
 			//System.out.println("False at cluster");
 			return false;
-		}
+		}*/
 		
 		return true;
 	}
@@ -329,6 +349,7 @@ public class Board{
 			}else{
 					
 				if(explore(closeNeighbor, length++, z)){
+					c.isVisited = false; //change
 					return true; // pop stack
 						
 				}
