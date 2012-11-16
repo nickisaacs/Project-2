@@ -43,6 +43,7 @@ public class MachinePlayer extends Player {
 	  if(numChips < 10){
 		Move chosenMove = (Move) addMoveScore(this.color);
 		internal.makeMove(chosenMove,color);
+		internal.printBoard();
 		numChips++;
 		return chosenMove;
 	  }else{

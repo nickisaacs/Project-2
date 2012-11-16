@@ -493,6 +493,20 @@ public class Board{
 	public boolean touched(int x, int y){
 		return BoardSize[x][y].isTouched;
 	}
+	
+	public void printBoard(){
+		for(int i=0; i<8; i++){
+			System.out.println("\n");
+			for(int j=0; j<8; j++){
+				if(BoardSize[i][j] == null){
+					System.out.print(" |");
+				}else{
+					System.out.print(BoardSize[i][j].chipColor + "|");
+				}
+			}
+		}
+	}
+				
 		
 	
 	
