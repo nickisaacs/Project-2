@@ -498,11 +498,16 @@ public class Board{
 		System.out.print("|");
 		for(int i=0; i<8; i++){
 			for(int j=0; j<8; j++){
-				if(BoardSize[j][i] == null){
-					System.out.print(" |");
-				}else{
-					System.out.print(BoardSize[j][i].chipColor + "|");
+				try{
+					if(BoardSize[j][i] == null){
+						System.out.print(" |");
+					}else{
+						System.out.print(BoardSize[j][i].chipColor + "|");
+					}
 				}
+				catch(NullPointerException e){
+					System.out.println("failed to print board contents at: ("+j+","+i+")");
+				} 
 			}
 			System.out.print("\n");
 			System.out.print("|");
