@@ -169,11 +169,14 @@ public class MachinePlayer extends Player {
 		int maxScore = -10000;
 		int x = -1;
 		int y = -1;
+		int x1 = -1;
+		int y1 = -1;
 		MoveScore ourMove = null;
 		MoveScore theirMove = null;
 		for(int i=0; i<8; i++){
 			for(int j=0; j<8; j++){
 				
+
 				if(internal.BoardSize[i][j] != null && internal.BoardSize[i][j].chipColor == color){
 						Chip temp = internal.BoardSize[i][j];
 						internal.BoardSize[i][j] = null;
@@ -183,44 +186,34 @@ public class MachinePlayer extends Player {
 						}
 						ourMove = addMoveScore(i,j, color);
 						internal.addChip(ourMove.x1,ourMove.y1,color);
-						
+
+
 						theirMove = addMoveScore(oppColor); 
+						internal.BoardSize[i][j] = temp;
+						internal.removeChip(ourMove.x1, ourMove.y1);
+						internal.printBoard();
 						
+				}
+				if(ourMove != null && theirMove != null){
+					if(maxScore < (ourMove.score-theirMove.score)){
+						maxScore = (ourMove.score-theirMove.score);
+						x = i;
+						y = j;
+						x1 = ourMove.x1;
+						y1 = ourMove.y1;
+						System.out.println("Our Move " + ourMove.x1 + ourMove.y1 + x + y);
+					}
+					
 				}
 				
-				if(maxScore < (ourMove.score-theirMove.score)){
-					maxScore = (ourMove.score-theirMove.score);
-				}
-				internal.removeChip(ourMove.x1, ourMove.y1);
 			}
 		}
-		return new Move(x, y);
+		System.out.println("Our Move " + x1 + y1 + x + y);
+		return new Move(x1, y1,x,y);
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
   /*
   public static void main (String[] args){

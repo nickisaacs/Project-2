@@ -38,12 +38,14 @@ public class Board{
 		}
 	}
 	public void removeChip(int x, int y){
-		if(BoardSize[x][y].chipColor == MachinePlayer.WHITE){
-			numWhite--;
-		}else{
-			numBlack--;
+		if(BoardSize[x][y] != null){
+			if(BoardSize[x][y].chipColor == MachinePlayer.WHITE){
+				numWhite--;
+			}else{
+				numBlack--;
+			}
+			BoardSize[x][y] = null;
 		}
-		BoardSize[x][y] = null;
 	}
 	
 	public int number(int color){
@@ -157,7 +159,7 @@ public class Board{
 					if(BoardSize[x+i][y+j] == null)
 						continue;
 					if(BoardSize[x+i][y+j] != null){
-						if(BoardSize[x+i][y+j].chipColor == color)
+						if(BoardSize[x+i][y+j].chipColor == color){
 							count++;
 							int x2 = x+i;
 							int y2 = y+j;
@@ -165,7 +167,7 @@ public class Board{
 								for(int b=-1; b<2; b++){
 										if(x2+a < 0 || x2+a >7) continue;
 										if(y2+b < 0 || y2+b >7) continue;
-										if(BoardSize[x2+a][y2+b] == null || (x2+a == x && y2+b ==y)){
+										if(BoardSize[x2+a][y2+b] == null || (x2+a == x && y2+b ==y) || (a == 0 && b == 0)){
 											continue;
 										}else{
 											if(BoardSize[x2+a][y2+b] != null){
@@ -175,6 +177,7 @@ public class Board{
 										}
 								}
 							}
+						}
 							
 					}
 				}
@@ -415,7 +418,7 @@ public class Board{
 								
 								if((c.y+z) > 7 || (c.x+i) > 7) break;
 								if(BoardSize[c.x+i][c.y+z] != null){
-									temp = BoardSize[c.x+z][c.y+i];
+									temp = BoardSize[c.x+i][c.y+z];
 									return temp;
 								}
 							}
@@ -438,8 +441,8 @@ public class Board{
 							for(int z=1; z<=(c.y); z++){
 								
 								if((c.y+z) < 7 || (c.x-i) < 1) break;
-								if(BoardSize[c.x-i][c.y-i] != null){
-									temp = BoardSize[c.x-i][c.y-i];
+								if(BoardSize[c.x-i][c.y-z] != null){
+									temp = BoardSize[c.x-i][c.y-z];
 									return temp;
 								}
 							}
@@ -466,6 +469,7 @@ public class Board{
 		}
 		if(color == MachinePlayer.BLACK){
 			for(int i=1; i<7; i++){
+				if(BoardSize[i][0] == null|| BoardSize[i][7] == null) continue; 
 				if(BoardSize[i][0].chipColor == color || BoardSize[i][7].chipColor == color) return false;
 			}
 			return true;
