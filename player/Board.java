@@ -26,6 +26,10 @@ public class Board{
 		return BoardSize[x][y];	
 	}
 	
+	public int totalChipCount(){
+		return (numBlack + numWhite);
+	}
+	
 	public void addChip(int x, int y, int color){
 		
 		BoardSize[x][y] = new Chip(x, y, color);
@@ -36,6 +40,7 @@ public class Board{
 		}else{
 			numBlack++;
 		}
+		printBoard();
 	}
 	public void removeChip(int x, int y){
 		if(BoardSize[x][y] != null){
@@ -285,6 +290,18 @@ public class Board{
 		}
 	}
 	
+	public void unmakeMove(Move m){
+		switch(m.moveKind){
+			
+			case Move.STEP:
+				BoardSize[m.x2][m.y2] = BoardSize[m.x1][m.y1]; 
+				BoardSize[m.x1][m.y1] = null; 
+			
+			case Move.ADD:
+				removeChip(m.x1, m.y1);
+		}
+	}
+	
 	/**
 	 * 
 	 * @param color
@@ -461,7 +478,6 @@ public class Board{
 
 		if(color == MachinePlayer.WHITE){
 			for(int i=1; i<7; i++){
-				System.out.println("I is: "+i);
 				if(BoardSize[0][i] == null|| BoardSize[7][i] == null) continue; 
 				if(BoardSize[0][i].chipColor == color || BoardSize[7][i].chipColor == color) return false;
 			}
@@ -499,14 +515,18 @@ public class Board{
 	}
 	
 	public void printBoard(){
-		System.out.print("|");
 		for(int i=0; i<8; i++){
+			System.out.print("|");
 			for(int j=0; j<8; j++){
 				try{
 					if(BoardSize[j][i] == null){
 						System.out.print(" |");
 					}else{
-						System.out.print(BoardSize[j][i].chipColor + "|");
+						if(BoardSize[j][i].chipColor == MachinePlayer.BLACK){
+							System.out.print("B|");
+						}else{
+							System.out.print("W|");
+						}
 					}
 				}
 				catch(NullPointerException e){
@@ -514,8 +534,11 @@ public class Board{
 				} 
 			}
 			System.out.print("\n");
-			System.out.print("|");
+			
 		}
+		System.out.print("\n");
+		System.out.print("-----------------------------");
+		System.out.println("\n");
 	}
 				
 		

@@ -15,7 +15,6 @@ public class MachinePlayer extends Player {
   public int color;
   public int oppColor;
   public int searchDepth;
-  private int numChips;
   private Board internal;
   // Creates a machine player with the given color.  Color is either 0 (black)
   // or 1 (white).  (White has the first move.)
@@ -40,18 +39,61 @@ public class MachinePlayer extends Player {
   // the internal game board) as a move by "this" player.
   public Move chooseMove() {
 	  
-	  if(numChips < 10){
-		Move chosenMove = (Move) addMoveScore(this.color);
+	  if(internal.totalChipCount() < 20){
+		Move chosenMove = (Move) addMoveScore(color);
 		internal.makeMove(chosenMove,color);
 		internal.printBoard();
-		numChips++;
 		return chosenMove;
 	  }else{
-			Move chosenMove = stepMoveScore();
+			Move chosenMove = stepMoveScore(color);
 			internal.makeMove(chosenMove, color);
 			return chosenMove;
 	  }
   } 
+  /*
+  public Move chooseMove(){
+	  return recursiveChooser(this.searchDepth);
+  }
+  
+  public Move recursiveChooser(int searchDepth){
+	  
+	  Move bestMove = null;
+	  Move theirBestMove = null;
+	  
+	  if(internal.totalChipCount() < 11){
+		  
+		bestMove = (Move) addMoveScore(color);
+	  
+	  }else{
+		bestMove = stepMoveScore(color);
+	  }
+	  
+	  internal.makeMove(bestMove, color);
+	  
+	  // If you have searched deep enough, delete the move and return
+	  if(searchDepth < 1){
+		  internal.unmakeMove(bestMove);
+		  System.out.println("Returning bestMove");
+		  return bestMove;
+	  }
+	  // Othewise, check the opponents best move, make it, and recurse
+	  else{
+		  
+		if(internal.totalChipCount() < 11){
+		  
+			theirBestMove = (Move) addMoveScore(oppColor);
+	  
+		}else{
+			theirBestMove = stepMoveScore(oppColor);
+		}
+	  
+		internal.makeMove(theirBestMove, oppColor);
+		bestMove = recursiveChooser(searchDepth--);
+	  }
+	  internal.unmakeMove(theirBestMove);
+	  return bestMove;
+  } */
+		  
 
 /*
 	public Move chooseMove(){
@@ -97,16 +139,212 @@ public class MachinePlayer extends Player {
   	}
     return false;
   }
-  
+
   /** Private function used to score a move
    * from the perspective of @scoringColor 
    */
    
-  public int score(Chip c){
+  public int score(int x, int y, int color){
+	  int score = 0;
+	  internal.addChip(x, y, color);
+	  if(internal.hasNetwork(color)){
+		  score += 100000;
+	  }
+	  if(x==1 || x==6){
+		  score += 100;
+	  }
+	  if(x == 2 || x == 5){
+		  score += 200;
+	  }
+	  if(x == 3 || x == 4){
+		  score += 300;
+	  }
+	  if(y==1 || y==6){
+		  score += 100;
+	  }
+	  if(y == 2 || y == 5){
+		  score += 200;
+	  }
+	  
+	  if(y == 3 || y == 4){
+		  score += 300;
+	  }
+	  if(getBlock(x,y,oppColor)){
+		  score += 5000;
+	  }
+	  if(getBlock(x,y,color)){
+		  score -= 500;
+	  }
+	  if(internal.neighbors(x, y, color)){
+		  score -= 500;
+	  }
+	  if(internal.neighbors(x, y, oppColor)){
+		  score += 500;
+	  }
+	  if(explore(x,y) == 1){
+		  score += 300;
+	  }
+	  if(explore(x,y) == 2){
+		  score += 400;
+	  }
+	  if(explore(x,y) == 3){
+		  score += 500;
+	  }
+	  if(explore(x,y) == 4){
+		  score += 600;
+	  }
+	  if(explore(x,y) > 4){
+		  score += 1000;
+	  }
+	  if(internal.isEndGoal(internal.getContents(x, y)) && numChips >= 5){
+		  score += 5000;
+	  }
+	  if(internal.isStartGoal(internal.getContents(x,y)) && numChips >= 5){
+		  score += 5000;
+	  }
+	  
+	  System.out.println("Score " + score);
+	  
+	  
+	  
+	  internal.removeChip(x, y);
+	  return score;
+	  /*
 	  Random generator = new Random();
 
 	  return (Math.abs(generator.nextInt()%1000));
+	  */
   }
+  
+  
+  private boolean getBlock(int x, int y, int color){
+		int count1 = 0;
+		int count2 = 0;
+		int count3 = 0;
+		int count4 = 0;
+		int count5 = 0;
+		int count6 = 0;
+		int count7 = 0;
+		int count8 = 0;
+		for(int a = 1; a<9; a++){	
+			switch(a){
+		
+				case 1: 
+					for(int i=1; i<=(y); i++){
+						if(internal.getContents(x, y-i)!= null)
+							if(internal.getContents(x, y-i).chipColor == color){
+								count1 = 1;
+								break;
+							}
+					}
+					
+				case 2: 
+					for(int i=1; i<=(7-y); i++){
+						if(internal.getContents(x, y+i)!= null)
+							if(internal.getContents(x, y+i).chipColor == color){
+								count2 = 1;
+								break;
+							}
+					}
+				
+				case 3: 
+					for(int i=1; i<=(x); i++){
+						if(internal.getContents(x-i, y) != null)
+							if(internal.getContents(x-i, y).chipColor == color){
+								count3 = 2;
+								break;
+							}
+					}
+				
+				case 4: 
+					for(int i=1; i<=(7-x); i++){
+						if(internal.getContents(x+i, y) != null)
+							if(internal.getContents(x+i, y).chipColor == color){
+								count4 = 2;
+								break;
+							}
+				}
+				
+				case 5: 
+					for(int i=1; i<=(7-x); i++){
+						for(int z=1; z<=(y); z++){
+							
+							if((x+i)>7 || (y-z)<1) break;
+							if(internal.getContents(x+i, y-z) != null)
+								if(internal.getContents(x+i, y-z).chipColor == color){
+									count5 = 3;
+									break;
+								}
+						}
+					}
+				
+				case 6: 
+					for(int i=1; i<=(7-x); i++){
+						for(int z=1; z<=(7-y); z++){
+							
+							if((y+z) > 7 || (x+i) > 7) break;
+							if(internal.getContents(x+i, y+z) != null)
+								if(internal.getContents(x+i, y+z).chipColor == color){
+									count6 = 4;
+									break;
+								}
+						}
+					}
+				
+				case 7: 
+					for(int i=1; i<=(7-x); i++){
+						for(int z=1; z<=(7-y); z++){
+							
+							if((y+z) > 7 || (x-i) < 1) break;
+							if(internal.getContents(x-i, y+z) != null)
+								if(internal.getContents(x-i, y+z).chipColor == color){
+									count7 = 3;
+									break;
+								}
+						}
+					}
+				
+				case 8: 
+					for(int i=1; i<=(7-x); i++){
+						for(int z=1; z<=(y); z++){
+							if((y+z) < 7 || (x-i) < 1) break;
+							if(internal.getContents(x-i, y-z) != null)
+								if(internal.getContents(x-i, y-z).chipColor == color){
+									count8 = 4;
+									break;
+								}
+						}
+					}
+				
+				default:
+					break;
+				}
+			if(count1 == count2 && count1 !=0){
+				return true;
+			}
+			if(count3 == count4 && count3 !=0){
+				return true;
+			}
+			if(count5 == count7 && count5 != 0){
+				return true;
+			}
+			if(count6 == count8 && count6 != 0){
+				return true;
+			}
+			
+		}
+		
+		
+			//return null;
+		return false;
+}
+  private int explore(int x, int y){
+	  int count = 0;
+	  count = internal.getAllNeighbors(x, y);
+	  
+	  return count;
+  }
+  
   
   /** addMoveScore() returns the score resulting from adding a chip
    * at the given location
@@ -165,7 +403,8 @@ public class MachinePlayer extends Player {
 	/** stepMoveScore() returns the score resulting from adding a chip
    * at the given location and moving it somewhere else
    */
-	private Move stepMoveScore(){
+	private Move stepMoveScore(int color){
+		int tempOpponent = opponentColorFinder(color);
 		int maxScore = -10000;
 		int x = -1;
 		int y = -1;
@@ -180,7 +419,7 @@ public class MachinePlayer extends Player {
 				if(internal.BoardSize[i][j] != null && internal.BoardSize[i][j].chipColor == color){
 						Chip temp = internal.BoardSize[i][j];
 						internal.BoardSize[i][j] = null;
-						if(internal.hasNetwork(oppColor)){
+						if(internal.hasNetwork(tempOpponent)){
 							internal.BoardSize[i][j] = temp;
 							continue;
 						}
@@ -188,7 +427,7 @@ public class MachinePlayer extends Player {
 						internal.addChip(ourMove.x1,ourMove.y1,color);
 
 
-						theirMove = addMoveScore(oppColor); 
+						theirMove = addMoveScore(tempOpponent); 
 						internal.BoardSize[i][j] = temp;
 						internal.removeChip(ourMove.x1, ourMove.y1);
 						internal.printBoard();
@@ -201,17 +440,21 @@ public class MachinePlayer extends Player {
 						y = j;
 						x1 = ourMove.x1;
 						y1 = ourMove.y1;
-						System.out.println("Our Move " + ourMove.x1 + ourMove.y1 + x + y);
 					}
 					
 				}
 				
 			}
 		}
-		System.out.println("Our Move " + x1 + y1 + x + y);
 		return new Move(x1, y1,x,y);
 	}
 	
+	private int opponentColorFinder(int color){
+		if(color == WHITE){
+			return BLACK;
+		}
+		return WHITE;
+	}
 	
 
 	
