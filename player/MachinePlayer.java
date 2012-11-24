@@ -14,9 +14,9 @@ public class MachinePlayer extends Player {
   public final static int BLACK = 0;
   public int color;
   public int oppColor;
-  public int searchDepth;
+  public int searchDepth = 3;
   private int numChips;
-  private Board internal;
+  protected Board internal;
   private Move[] lastMovesMade;
   
   // Creates a machine player with the given color.  Color is either 0 (black)
@@ -31,7 +31,7 @@ public class MachinePlayer extends Player {
 	lastMovesMade = new Move[3];
   	internal = new Board();
   	this.color = color;
-  	this.searchDepth = searchDepth;
+  	//this.searchDepth = searchDepth;
   	if(color==WHITE){
   		oppColor = BLACK;
   	}else{
@@ -47,52 +47,27 @@ public class MachinePlayer extends Player {
 		Move chosenMove = (Move) addMoveScore(this.color);
 		internal.makeMove(chosenMove,color);
 		numChips++;
+		internal.printBoard();
 		return chosenMove;
 	  }else{
 			Move chosenMove = stepMoveScore();
-			
-			if(lastMovesMade[2] != null){
-				System.out.println("REACHED HERE FIRST");
-				if(staleMate(chosenMove)){
-					System.out.println("REACHED HERE");
-					while(true){
-						Move staleBreaker = randomMove();
-						if(staleMate(staleBreaker)){
-							continue;
-						}else{
-							System.out.println("REACHED!");
-							internal.makeMove(chosenMove, color);
-							return staleBreaker;
-						}
-					}
-				}	
+			if(staleMate(chosenMove)){
+				System.out.println("Reached this");
+				Move staleBreaker = staleMove();
+				updateMoves(staleBreaker);
+				internal.makeMove(staleBreaker,color);
+				numChips++;
+				internal.printBoard();
+				return chosenMove;
 			}
-			internal.makeMove(chosenMove, color);
 			updateMoves(chosenMove);
+			internal.makeMove(chosenMove,color);
+			numChips++;
+			internal.printBoard();
 			return chosenMove;
 		}
   }
 
-/*
-	public Move chooseMove(){
-		Random generator = new Random();
-		int cordX = Math.abs(generator.nextInt()%8);
-		int cordY = Math.abs(generator.nextInt()%8);
-		System.out.println("Accessing: ("+cordX+","+cordY+")");
-		while(true){
-			
-			Move temp = new Move(cordX, cordY);
-			if(internal.isLegal(temp, color)){
-				internal.makeMove(temp, color);
-				return temp;
-			}else{
-			cordX = Math.abs(generator.nextInt()%8);
-			cordY = Math.abs(generator.nextInt()%8);
-			System.out.println(color+" Accessing: ("+cordX+","+cordY+")");
-		}
-		}	
-	}
-*/
   // If the Move m is legal, records the move as a move by the opponent
   // (updates the internal game board) and returns true.  If the move is
   // illegal, returns false without modifying the internal state of "this"
@@ -181,7 +156,7 @@ public class MachinePlayer extends Player {
 		  score += 5000;
 	  }
 	  
-	  System.out.println("Score " + score);
+	  //System.out.println("Score " + score);
 	  
 	  
 	  
@@ -349,7 +324,7 @@ public class MachinePlayer extends Player {
 			}
 	
 		}
-		System.out.println("Score picked " + maxScore);
+		//System.out.println("Score picked " + maxScore);
 		return new MoveScore(x, y, maxScore);
 	}
 	private MoveScore addMoveScore(int a, int b, int color){
@@ -374,7 +349,7 @@ public class MachinePlayer extends Player {
 			}
 	
 		}
-		System.out.println("Score picked " + maxScore);
+		//System.out.println("Score picked " + maxScore);
 		return new MoveScore(x, y, maxScore);
 	}
 	
@@ -416,14 +391,14 @@ public class MachinePlayer extends Player {
 						y = j;
 						x1 = ourMove.x1;
 						y1 = ourMove.y1;
-						System.out.println("Our Move " + ourMove.x1 + ourMove.y1 + x + y);
+						//System.out.println("Our Move " + ourMove.x1 + ourMove.y1 + x + y);
 					}
 					
 				}
 				
 			}
 		}
-		System.out.println("Score picked " + maxScore);
+		//System.out.println("Score picked " + maxScore);
 		return new Move(x1, y1,x,y);
 	}
 	
@@ -431,7 +406,7 @@ public class MachinePlayer extends Player {
 	 * 
 	 */
 	 
-	private Move randomMove(){
+	private Move staleMove(){
 		Random generator = new Random();
 		while(true){
 			int x = Math.abs(generator.nextInt())%7;
@@ -447,15 +422,11 @@ public class MachinePlayer extends Player {
 	 *  reached
 	 */
 	private boolean staleMate(Move m){
-		Move tempArray[] = new Move[3];
-		tempArray[2] = lastMovesMade[1];
-		tempArray[1] = lastMovesMade[0];
-		tempArray[0] = m;
-		if(tempArray[0] == tempArray[2]){
-			lastMovesMade = tempArray;
+		
+		if(lastMovesMade[1] == null)return false;
+		if(lastMovesMade[1].x1 == m.x1 && lastMovesMade[1].y1 == m.y1){
 			return true;
 		}
-		lastMovesMade = tempArray;
 		return false;
 	}
 
@@ -466,54 +437,6 @@ public class MachinePlayer extends Player {
 		tempArray[0] = m;
 		lastMovesMade = tempArray;
 	}
-	
-  /*
-  public static void main (String[] args){
-	Board test = new Board();
-	System.out.println(test.getContents(0,0));
-	System.out.println(test.getContents(7,7));
-	test.addChip(0,0,BLACK);
-	test.addChip(7,7,WHITE);
-	System.out.println(test.getContents(0,0).chipColor);
-	System.out.println(test.getContents(7,7).chipColor);
-	test.addChip(1,1,BLACK);
-	test.addChip(1,2,WHITE);
-	System.out.println(test.number(BLACK));
-	System.out.println(test.number(WHITE)); // tested through number
-	System.out.println(test.touched(0,0)); // used to make sure if one chip is placed and says touched
-	System.out.println(test.touched(1,1)); // that the other chip is also changed to touched.
-	System.out.println(test.touched(1,2));
-	System.out.println(test.touched(7,7)); 
-	Move practice = new Move(0,1);
-	System.out.println("Tested " + test.isLegal(practice, BLACK));
-	Move practice1 = new Move(6,6);
-	System.out.println("Testing this one " + test.isLegal(practice1, WHITE));
-	Move practice2 = new Move(1,0);
-	System.out.println(test.isLegal(practice2, BLACK));
-	
-	Move practice10 = new Move(0,2);
-	Move practice11 = new Move(2,2);
-	Move practice12 = new Move(2,4);
-	Move practice13 = new Move(4,4);
-	Move practice14 = new Move(4,2);
-	Move practice15 = new Move(7,2);
-	
-	test = new Board();
-	
-	test.makeMove(practice10, WHITE);
-	test.makeMove(practice11, WHITE);
-	test.makeMove(practice12, WHITE);
-	test.makeMove(practice13, WHITE);
-	test.makeMove(practice14, WHITE);
-	test.makeMove(practice15, WHITE);
-	
-	if(test.hasNetwork(WHITE)){
-		System.out.println("working");
-	}else{
-		System.out.println("broken");
-  	}
-
-  }*/
 	
 	public static void main(String [] args){
 		Board test = new Board();
