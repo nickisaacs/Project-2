@@ -26,10 +26,6 @@ public class Board{
 		return BoardSize[x][y];	
 	}
 	
-	public int totalChipCount(){
-		return (numBlack + numWhite);
-	}
-	
 	public void addChip(int x, int y, int color){
 		
 		BoardSize[x][y] = new Chip(x, y, color);
@@ -40,7 +36,6 @@ public class Board{
 		}else{
 			numBlack++;
 		}
-		printBoard();
 	}
 	public void removeChip(int x, int y){
 		if(BoardSize[x][y] != null){
@@ -60,7 +55,7 @@ public class Board{
 		return numWhite;
 	}
 		
-	private boolean neighbors(int x, int y, int color){ // Returns true if it touches same color chip
+	public boolean neighbors(int x, int y, int color){ // Returns true if it touches same color chip
 		
 		if(numNeighbors(x,y,color) > 1) //easy clusters
 			return true;
@@ -290,18 +285,6 @@ public class Board{
 		}
 	}
 	
-	public void unmakeMove(Move m){
-		switch(m.moveKind){
-			
-			case Move.STEP:
-				BoardSize[m.x2][m.y2] = BoardSize[m.x1][m.y1]; 
-				BoardSize[m.x1][m.y1] = null; 
-			
-			case Move.ADD:
-				removeChip(m.x1, m.y1);
-		}
-	}
-	
 	/**
 	 * 
 	 * @param color
@@ -471,10 +454,87 @@ public class Board{
 				//return null;
 	}
 	
+	public int getAllNeighbors(int x, int y){
+		int count = 0;
+					
+						for(int i=1; i<=(y); i++){
+							if(BoardSize[x][y-i]!= null){
+								count ++;
+								break;
+							}
+						}
+						
+						for(int i=1; i<=(7-y); i++){
+							if(BoardSize[x][y+i]!= null){
+								count++;
+								break;
+							}	
+						}
+					
+						for(int i=1; i<=(x); i++){
+							if(BoardSize[x-i][y]!= null){
+								count ++;
+								break;
+							}
+						}
+					
+						for(int i=1; i<=(7-x); i++){
+							if(BoardSize[x+i][y]!= null){
+							count ++;
+							break;
+						}
+					}
+					
+						for(int i=1; i<=(7-x); i++){
+							for(int z=1; z<=(y); z++){
+								
+								if((x+i)>7 || (y-z)<1) break;
+								if(BoardSize[x+i][y-z] != null){
+									count ++;
+									break;
+								}
+							}
+						}
+					
+						for(int i=1; i<=(7-x); i++){
+							for(int z=1; z<=(7-y); z++){
+								
+								if((y+z) > 7 || (x+i) > 7) break;
+								if(BoardSize[x+i][y+z] != null){
+									count ++;
+									break;
+								}
+							}
+						}
+					
+						for(int i=1; i<=(7-x); i++){
+							for(int z=1; z<=(7-y); z++){
+								
+								if((y+z) > 7 || (x-i) < 1) break;
+								if(BoardSize[x-i][y+z] != null){
+									count ++;
+									break;
+								}
+							}
+						}
+					
+						for(int i=1; i<=(7-x); i++){
+							for(int z=1; z<=(y); z++){
+								
+								if((y+z) < 7 || (x-i) < 1) break;
+								if(BoardSize[x-i][y-z] != null){
+									count ++;
+									break;
+								}
+							}
+						}
+		return count;
+	}
+	
 	/**
 	* Private method to check if the goal of @color is empty
 	*/
-	private boolean goalIsEmpty(int color){
+	public boolean goalIsEmpty(int color){
 
 		if(color == MachinePlayer.WHITE){
 			for(int i=1; i<7; i++){
@@ -497,14 +557,14 @@ public class Board{
 	* Helper funciton used by explore to determine if a chip is in its 
 	* own start goal
 	*/
-	private boolean isStartGoal(Chip c){
+	public boolean isStartGoal(Chip c){
 	
 		if(c.chipColor == MachinePlayer.WHITE && c.x == 0) return true;
 		if(c.chipColor == MachinePlayer.BLACK && c.y == 0) return true;
 		return false;
 	}	
 	
-	private boolean isEndGoal(Chip c){
+	public boolean isEndGoal(Chip c){
 		
 		if(c.chipColor == MachinePlayer.WHITE && c.x == 7) return true;
 		if(c.chipColor == MachinePlayer.BLACK && c.y == 7) return true;
@@ -515,18 +575,14 @@ public class Board{
 	}
 	
 	public void printBoard(){
+		System.out.print("|");
 		for(int i=0; i<8; i++){
-			System.out.print("|");
 			for(int j=0; j<8; j++){
 				try{
 					if(BoardSize[j][i] == null){
 						System.out.print(" |");
 					}else{
-						if(BoardSize[j][i].chipColor == MachinePlayer.BLACK){
-							System.out.print("B|");
-						}else{
-							System.out.print("W|");
-						}
+						System.out.print(BoardSize[j][i].chipColor + "|");
 					}
 				}
 				catch(NullPointerException e){
@@ -534,11 +590,8 @@ public class Board{
 				} 
 			}
 			System.out.print("\n");
-			
+			System.out.print("|");
 		}
-		System.out.print("\n");
-		System.out.print("-----------------------------");
-		System.out.println("\n");
 	}
 				
 		

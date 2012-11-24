@@ -15,7 +15,10 @@ public class MachinePlayer extends Player {
   public int color;
   public int oppColor;
   public int searchDepth;
+  private int numChips;
   private Board internal;
+  private Move[] lastMovesMade;
+  
   // Creates a machine player with the given color.  Color is either 0 (black)
   // or 1 (white).  (White has the first move.)
   public MachinePlayer(int color) {
@@ -25,6 +28,7 @@ public class MachinePlayer extends Player {
   // Creates a machine player with the given color and search depth.  Color is
   // either 0 (black) or 1 (white).  (White has the first move.)
   public MachinePlayer(int color, int searchDepth) {
+	lastMovesMade = new Move[3];
   	internal = new Board();
   	this.color = color;
   	this.searchDepth = searchDepth;
@@ -39,61 +43,35 @@ public class MachinePlayer extends Player {
   // the internal game board) as a move by "this" player.
   public Move chooseMove() {
 	  
-	  if(internal.totalChipCount() < 20){
-		Move chosenMove = (Move) addMoveScore(color);
+	  if(numChips < 10){
+		Move chosenMove = (Move) addMoveScore(this.color);
 		internal.makeMove(chosenMove,color);
-		internal.printBoard();
+		numChips++;
 		return chosenMove;
 	  }else{
-			Move chosenMove = stepMoveScore(color);
+			Move chosenMove = stepMoveScore();
+			
+			if(lastMovesMade[2] != null){
+				System.out.println("REACHED HERE FIRST");
+				if(staleMate(chosenMove)){
+					System.out.println("REACHED HERE");
+					while(true){
+						Move staleBreaker = randomMove();
+						if(staleMate(staleBreaker)){
+							continue;
+						}else{
+							System.out.println("REACHED!");
+							internal.makeMove(chosenMove, color);
+							return staleBreaker;
+						}
+					}
+				}	
+			}
 			internal.makeMove(chosenMove, color);
+			updateMoves(chosenMove);
 			return chosenMove;
-	  }
-  } 
-  /*
-  public Move chooseMove(){
-	  return recursiveChooser(this.searchDepth);
-  }
-  
-  public Move recursiveChooser(int searchDepth){
-	  
-	  Move bestMove = null;
-	  Move theirBestMove = null;
-	  
-	  if(internal.totalChipCount() < 11){
-		  
-		bestMove = (Move) addMoveScore(color);
-	  
-	  }else{
-		bestMove = stepMoveScore(color);
-	  }
-	  
-	  internal.makeMove(bestMove, color);
-	  
-	  // If you have searched deep enough, delete the move and return
-	  if(searchDepth < 1){
-		  internal.unmakeMove(bestMove);
-		  System.out.println("Returning bestMove");
-		  return bestMove;
-	  }
-	  // Othewise, check the opponents best move, make it, and recurse
-	  else{
-		  
-		if(internal.totalChipCount() < 11){
-		  
-			theirBestMove = (Move) addMoveScore(oppColor);
-	  
-		}else{
-			theirBestMove = stepMoveScore(oppColor);
 		}
-	  
-		internal.makeMove(theirBestMove, oppColor);
-		bestMove = recursiveChooser(searchDepth--);
-	  }
-	  internal.unmakeMove(theirBestMove);
-	  return bestMove;
-  } */
-		  
+  }
 
 /*
 	public Move chooseMove(){
@@ -139,7 +117,7 @@ public class MachinePlayer extends Player {
   	}
     return false;
   }
-
+  
   /** Private function used to score a move
    * from the perspective of @scoringColor 
    */
@@ -345,7 +323,6 @@ public class MachinePlayer extends Player {
 	  return count;
   }
   
-  
   /** addMoveScore() returns the score resulting from adding a chip
    * at the given location
    */
@@ -361,7 +338,7 @@ public class MachinePlayer extends Player {
 								
 				if(internal.isLegal(tempMove, color)){
 					
-					int temp = score(internal.getContents(i, j));
+					int temp = score(i, j, color);
 					if(temp > maxScore){
 						maxScore = temp;
 						x = i;
@@ -372,7 +349,7 @@ public class MachinePlayer extends Player {
 			}
 	
 		}
-		
+		System.out.println("Score picked " + maxScore);
 		return new MoveScore(x, y, maxScore);
 	}
 	private MoveScore addMoveScore(int a, int b, int color){
@@ -386,7 +363,7 @@ public class MachinePlayer extends Player {
 				if (a == i && b == j) continue;
 				returnMove = new Move(i, j);					
 				if (internal.BoardSize[i][j] == null && internal.isLegal(returnMove, color)){
-					int temp = score(internal.getContents(i, j));
+					int temp = score(i, j, color);
 					if(temp > maxScore){
 						maxScore = temp;
 						x = i;
@@ -397,14 +374,14 @@ public class MachinePlayer extends Player {
 			}
 	
 		}
+		System.out.println("Score picked " + maxScore);
 		return new MoveScore(x, y, maxScore);
 	}
 	
 	/** stepMoveScore() returns the score resulting from adding a chip
    * at the given location and moving it somewhere else
    */
-	private Move stepMoveScore(int color){
-		int tempOpponent = opponentColorFinder(color);
+	private Move stepMoveScore(){
 		int maxScore = -10000;
 		int x = -1;
 		int y = -1;
@@ -419,7 +396,7 @@ public class MachinePlayer extends Player {
 				if(internal.BoardSize[i][j] != null && internal.BoardSize[i][j].chipColor == color){
 						Chip temp = internal.BoardSize[i][j];
 						internal.BoardSize[i][j] = null;
-						if(internal.hasNetwork(tempOpponent)){
+						if(internal.hasNetwork(oppColor)){
 							internal.BoardSize[i][j] = temp;
 							continue;
 						}
@@ -427,10 +404,9 @@ public class MachinePlayer extends Player {
 						internal.addChip(ourMove.x1,ourMove.y1,color);
 
 
-						theirMove = addMoveScore(tempOpponent); 
+						theirMove = addMoveScore(oppColor); 
 						internal.BoardSize[i][j] = temp;
 						internal.removeChip(ourMove.x1, ourMove.y1);
-						internal.printBoard();
 						
 				}
 				if(ourMove != null && theirMove != null){
@@ -440,23 +416,56 @@ public class MachinePlayer extends Player {
 						y = j;
 						x1 = ourMove.x1;
 						y1 = ourMove.y1;
+						System.out.println("Our Move " + ourMove.x1 + ourMove.y1 + x + y);
 					}
 					
 				}
 				
 			}
 		}
+		System.out.println("Score picked " + maxScore);
 		return new Move(x1, y1,x,y);
 	}
 	
-	private int opponentColorFinder(int color){
-		if(color == WHITE){
-			return BLACK;
+	/** returns a random legal move to break stalemates
+	 * 
+	 */
+	 
+	private Move randomMove(){
+		Random generator = new Random();
+		while(true){
+			int x = Math.abs(generator.nextInt())%7;
+			int y = Math.abs(generator.nextInt())%7;
+			Move random = new Move(x, y, lastMovesMade[2].x2, lastMovesMade[2].y2);
+			if(internal.isLegal(random, color)){
+				return random;
+			}
 		}
-		return WHITE;
 	}
 	
+	/** returns @true if a stalemate has been 
+	 *  reached
+	 */
+	private boolean staleMate(Move m){
+		Move tempArray[] = new Move[3];
+		tempArray[2] = lastMovesMade[1];
+		tempArray[1] = lastMovesMade[0];
+		tempArray[0] = m;
+		if(tempArray[0] == tempArray[2]){
+			lastMovesMade = tempArray;
+			return true;
+		}
+		lastMovesMade = tempArray;
+		return false;
+	}
 
+	private void updateMoves(Move m){
+		Move tempArray[] = new Move[3];
+		tempArray[2] = lastMovesMade[1];
+		tempArray[1] = lastMovesMade[0];
+		tempArray[0] = m;
+		lastMovesMade = tempArray;
+	}
 	
   /*
   public static void main (String[] args){
@@ -504,6 +513,15 @@ public class MachinePlayer extends Player {
 		System.out.println("broken");
   	}
 
-  }A*/
+  }*/
+	
+	public static void main(String [] args){
+		Board test = new Board();
+		MachinePlayer test2 = new MachinePlayer(WHITE);
+		test2.chooseMove();
+		test2.internal.printBoard();
+		test2.chooseMove();
+		test2.internal.printBoard();
+	}
 
 }
