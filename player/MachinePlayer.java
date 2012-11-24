@@ -17,7 +17,7 @@ public class MachinePlayer extends Player {
   public int searchDepth = 3;
   private int numChips;
   protected Board internal;
-  private Move[] lastMovesMade;
+ 
   
   // Creates a machine player with the given color.  Color is either 0 (black)
   // or 1 (white).  (White has the first move.)
@@ -28,7 +28,6 @@ public class MachinePlayer extends Player {
   // Creates a machine player with the given color and search depth.  Color is
   // either 0 (black) or 1 (white).  (White has the first move.)
   public MachinePlayer(int color, int searchDepth) {
-	lastMovesMade = new Move[3];
   	internal = new Board();
   	this.color = color;
   	//this.searchDepth = searchDepth;
@@ -51,16 +50,6 @@ public class MachinePlayer extends Player {
 		return chosenMove;
 	  }else{
 			Move chosenMove = stepMoveScore();
-			if(staleMate(chosenMove)){
-				System.out.println("Reached this");
-				Move staleBreaker = staleMove();
-				updateMoves(staleBreaker);
-				internal.makeMove(staleBreaker,color);
-				numChips++;
-				internal.printBoard();
-				return chosenMove;
-			}
-			updateMoves(chosenMove);
 			internal.makeMove(chosenMove,color);
 			numChips++;
 			internal.printBoard();
@@ -402,41 +391,9 @@ public class MachinePlayer extends Player {
 		return new Move(x1, y1,x,y);
 	}
 	
-	/** returns a random legal move to break stalemates
-	 * 
-	 */
-	 
-	private Move staleMove(){
-		Random generator = new Random();
-		while(true){
-			int x = Math.abs(generator.nextInt())%7;
-			int y = Math.abs(generator.nextInt())%7;
-			Move random = new Move(x, y, lastMovesMade[2].x2, lastMovesMade[2].y2);
-			if(internal.isLegal(random, color)){
-				return random;
-			}
-		}
-	}
-	
-	/** returns @true if a stalemate has been 
-	 *  reached
-	 */
-	private boolean staleMate(Move m){
-		
-		if(lastMovesMade[1] == null)return false;
-		if(lastMovesMade[1].x1 == m.x1 && lastMovesMade[1].y1 == m.y1){
-			return true;
-		}
-		return false;
-	}
 
-	private void updateMoves(Move m){
-		Move tempArray[] = new Move[3];
-		tempArray[2] = lastMovesMade[1];
-		tempArray[1] = lastMovesMade[0];
-		tempArray[0] = m;
-		lastMovesMade = tempArray;
-	}
+	
+
 	
 	public static void main(String [] args){
 		Board test = new Board();

@@ -192,53 +192,52 @@ public class Board{
 		if(m.moveKind == Move.QUIT) return true;
 		
 		if(m.moveKind == Move.STEP && (m.x1 == m.x2 && m.y1 == m.y2)){
-			//System.out.println("False at step move same place");
+			System.out.println("False at step move same place");
 			return false;
 		}
 		// Cant move to same place/existing chip
 		if(BoardSize[m.x1][m.y1] != null){
-			//System.out.println("False at occupied");
+			System.out.println("False at occupied");
 			return false; // Already occupied
 		}
 		
 		// Check the goal lines
 		if(color == MachinePlayer.WHITE){
 			if(m.y1 == 7 || m.y1 == 0){
-				//System.out.println("False at goal line 1");
+				System.out.println("False at goal line 1");
 				return false;
 			}
 		}
 		if(color == MachinePlayer.BLACK){
 			if(m.x1 == 7 || m.x1 == 0){
-				//System.out.println("False at goal line 2");
+				System.out.println("False at goal line 2");
 				return false;
 			}
 		}
 		// Check the corners
 		if(m.x1 == 0){
 			if(m.y1 == 0 || m.y1 == 7){
-				//System.out.println("False at corner");
+				System.out.println("False at corner");
 				return false;
 			}
 		}
 		if(m.x1 == 7){
 			if(m.y1 == 0 || m.y1 == 7){
-				//System.out.println("False at corner");
+				System.out.println("False at corner");
 				return false;
 			}
 		}
 		
 		/*if(m.moveKind == Move.STEP && neighbors(m.x1, m.y1, m.x2, m.y2, color)){
-			//System.out.println("False at cluster");
+			System.out.println("False at cluster");
 			return false;
 		}*/
 		//New Cluster Checker!!
-		if(numNeighbors(m.x1,m.y1,color) > 1) //easy clusters
+		if(numNeighbors(m.x1,m.y1,color) > 1){ //easy clusters
+			System.out.println("False at cluster");
 			return false;
-		/*if(m.moveKind == Move.ADD && neighbors(m.x1, m.y1, color)){
-			//System.out.println("False at cluster");
-			return false;
-		}*/
+		}
+		
 		
 		return true;
 	}
